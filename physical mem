@@ -1,0 +1,136 @@
+#include<iostream>
+#include<fstream>
+using namespace std;
+
+
+class OS{
+    private:
+        char M[100][4];     //Physical Memory
+        char IR[4];         //Instruction Register (4 bytes)
+        char R[4];          //General Purpose Register
+        int IC;             //Instruction Counter Register (2 bytes)
+        int SI;             //Interrupt
+        bool C;             //Toggle (1 byte)
+        char buffer[40];        
+   
+    public:
+        void init();
+        void LOAD();
+        void Execute();
+        void MOS();
+
+        fstream infile;
+        fstream outfile;
+};
+
+
+
+//initiallise everything to 0
+void OS::init()
+{
+
+    for(int i = 0; i<100; i++)
+    {    
+        for(int j = 0; j<4; j++ )
+        {  
+            M[i][j]=' ';
+           
+        }
+       
+    }    
+     
+   
+    IR[0] = ' ';
+    R[0] = ' ';
+    C = false;
+
+}
+
+
+//Master Mode
+void OS::MOS()
+{
+   
+    if(SI == 1)     //Read Mode
+    {  
+        for(int i=0;i<=39;i++)
+           buffer[i]='\0';
+           
+        infile.getline(buffer,40);
+       
+        int k = 0;
+        int i = IR[2]-48;
+        i = i*10;
+       
+       
+        for( int l=0 ; l<10 ;  ++l)
+        {  
+            for(int j = 0 ; j<4; ++j)
+            {
+                M[i][j] = buffer[k];
+                k++;                
+            }
+            if(k == 40)
+            {
+                break;              
+            }
+            i++;
+        }
+   
+        for(int i = 0; i<100; i++)
+        {
+            cout<<"M["<<i<<"]\t";
+            for(int j = 0; j<4; j++ )
+            {  
+                cout<<M[i][j];
+            }
+            cout<<endl;
+        }  
+    }
+    else if(SI == 2)        //Write Mode
+    {
+      for(int i=0;i<=39;i++)
+           buffer[i]='\0';
+       
+        int k = 0;
+        int i = IR[2]-48;
+        i = i*10;
+       
+       
+        for( int l=0 ; l<10 ;  ++l)
+        {  
+            for(int j = 0 ; j<4; ++j)
+            {
+                buffer[k]=M[i][j];
+                outfile<<buffer[k];
+
+                k++;                
+            }
+            if(k == 40)
+            {
+                break;                
+            }
+            i++;
+        }
+           for(int i = 0; i<100; i++)
+        {
+            cout<<"M["<<i<<"]\t";
+            for(int j = 0; j<4; j++ )
+            {  
+                cout<<M[i][j];
+            }
+            cout<<endl;
+        }  
+   
+        outfile<<"\n";
+     
+    }
+    else if(SI == 3)        //Terminate
+    {
+       
+        outfile<<"\n";
+        outfile<<"\n";
+
+    }
+
+}
