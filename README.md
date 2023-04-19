@@ -1,2 +1,1 @@
-# hello-world
-the beginning of the description
+Course project- OS
